@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Immersive Visualization</title>
+    <style>body { margin: 0; }</style>
+  </head>
+  <body>
+    <script src="https://threejs.org/build/three.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@webxr-polyfill/dist/webxr-polyfill.min.js"></script>
+    <script src="https://threejs.org/examples/jsm/webxr/VRButton.js"></script>
+
+    <script>
+      let scene, camera, renderer, controls;
+      
+      // Initialize the scene
+      function init() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.xr.enabled = true;
+        document.body.appendChild(VRButton.createButton(renderer));
+
+        camera.position.z = 5;
+
+        // Example data points with different values
+        const points = [
+          { x: 1, y: 2, z: 0, value: 90 },
+          { x: -2, y: 1, z: -1, value: 45 },
+          { x: 0, y: 3, z: 1, value: 80 },
+          { x: 2, y: -1, z: -2, value: 95 },  // High-value point
+        ];
+
+        // Visualize points with highlights
+        points.forEach((point) => {
+          const geometry = new THREE.SphereGeometry(0.1 * (point.value / 50), 32, 32);
+          const material = new THREE.MeshBasicMaterial({
+            color: point.value > 80 ? 0xff0000 : 0x00ff00,  // High-value points in red
+          });
+          const sphere = new THREE.Mesh(geometry, material);
+          sphere.position.set(point.x, point.y, point.z);
+          scene.add(sphere);
+        });
+
+        // Lighting
+        const light = new THREE.AmbientLight(0x404040, 2);
+        scene.add(light);
+      }
+
+      function animate() {
+        renderer.setAnimationLoop(() => {
+          renderer.render(scene, camera);
+        });
+      }
+
+      init();
+      animate();
+    </script>
+  </body>
+</html>
